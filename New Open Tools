@@ -1,0 +1,100 @@
+:: Move all of a file type in this folder to another
+:: by Larsepan
+
+@ECHO OFF
+CLS
+
+:INIT
+SET UN=
+SET choice=
+
+:MENU
+CLS
+ECHO.
+ECHO ...............................................
+ECHO 	New Open Tools Program
+ECHO ...............................................
+ECHO. 
+ECHO.
+ECHO 1 - Set a Username
+ECHO 2 - Login to Apps
+ECHO 2 - EXIT
+ECHO.
+
+:CURRENT USERNAME
+SetLocal EnableDelayedExpansion
+if not exist OpenTools.txt GOTO NOUSERSET
+FOR /F "delims=" %%i in (OpenTools.txt) do set UN=!UN! %%i
+ECHO Your current destination path is . . .  %UN%
+EndLocal
+GOTO PROMPTUSER
+
+:NOUSERSET
+ECHO You have not yet set a username.
+
+:PROMPTUSER
+ECHO.
+SET /P choice=Type a selection then press ENTER:
+IF %choice%==1 GOTO SETUSER
+IF %choice%==2 GOTO ADLOGIN
+IF %choice%==3 GOTO EOF
+IF %choice%=="" GOTO INIT
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+GOTO INIT
+
+:SETUSER
+CLS
+SET /P UN=What Is Your Username?
+
+CLS
+REM ECHO Type out the complete folder path:
+REM ECHO Example: C:\Users\someUser\Desktop\SomeFolder
+SetLocal EnableDelayedExpansion
+REM SET /P Path=Path:
+REM SET PathQ="!Path!"
+REM @echo !Path! > OpenTools.txt
+@echo !UN! > OpenTools.txt
+:: ECHO is off result
+ECHO You typed !UN!
+:: If the path's last folder does not exist, ask whether to create it
+REM if not exist !Path! GOTO PATHPROMPT
+REM @echo !Path! > OpenTools.txt
+::@echo !PathQ! > OpenTools.txt
+EndLocal
+REM ECHO Process Complete.
+ECHO.
+PAUSE
+GOTO INIT
+REM SET /P PW=What Is Your Password?
+REM SET "ISGOOD=PASS"
+
+REM FOR /F %%H IN ('NET USE "\\Server\home$\%UN%" /User:[The Domain]\%UN% %PW% 2^>^&1 ^| Find /I "System error 1311 has occurred."') DO SET "ISGOOD=FAIL"
+
+REM IF /I "%ISGOOD%"=="FAIL" GOTO :EOF
+
+:ADLOGIN
+CLS
+SetLocal EnableDelayedExpansion
+if not exist OpenTools.txt GOTO NOTEXIST
+FOR /F "delims=" %%i in (OpenTools.txt) do set UN=!UN! %%i
+REM SET=UN "!UN!"
+
+PAUSE
+ECHO runas called with !UN!
+PAUSE
+RUNAS /user:bsci\!UN! A_Execs.bat
+EndLocal
+ECHO Process Complete.
+ECHO.
+PAUSE
+GOTO INIT
+
+:NOTEXIST
+CLS
+ECHO No username has been stored.  Please set a username.
+PAUSE
+GOTO INIT
