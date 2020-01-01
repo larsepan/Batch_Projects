@@ -102,7 +102,7 @@ SET /P removeEntry=Entry:
 CLS
 if not exist PathList.txt GOTO NOPATHSET
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !removeEntry! set showRemove= %%H
-REM ECHO The entry is !showRemove!
+ECHO The entry is !showRemove!
 ::remove entry code
 
 EndLocal
@@ -119,7 +119,7 @@ SET /P readEntry=Entry:
 CLS
 if not exist PathList.txt GOTO NOPATHSET
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !readEntry! set showRead= %%H
-REM ECHO The entry is !showRead!
+ECHO The entry is !showRead!
 
 EndLocal
 PAUSE
