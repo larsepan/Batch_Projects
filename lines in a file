@@ -1,3 +1,16 @@
+::for /f "tokens=1*delims=:" %%G in ('findstr /n "^" 1234.txt') do if %%G equ 2 echo %%H
+
+::In the second example findstr counts the lines. Count is in %%G, line is in %%H. Echo it if count=2
+
+::for /f "tokens=1*delims=:" %%G in ('findstr /n "^" sometextfile.txt') do if %%G equ 2 set var= %%H
+
+::Hopefully this does the trick to assign var as whatever count %%G equ # line %%H is
+
+::::::::::::::::::::::::::::::
+
+:: Move all of a file type in this folder to another
+:: by Larsepan
+
 :: Lines in a File Test
 :: by Larsepan
 
@@ -12,44 +25,40 @@ SET choice=
 CLS
 ECHO.
 ECHO ...............................................
-ECHO 	FileList Test
+ECHO FileList Test
 ECHO ...............................................
 ECHO. 
 ECHO.
-ECHO 1 - Add to list
-ECHO 2 - Remove from list
-ECHO 3 - Show list #
+ECHO 1 - Manage Apps
+ECHO 2 - Manage Links
+ECHO 3 - Readme
 ECHO 4 - Exit
 ECHO.
 
 :ENTRYNO
 SetLocal EnableDelayedExpansion
-if not exist PathList.txt GOTO NOPATHSET
-set "cmd=findstr /R /N "^^" PathList.txt | find /C ":""
+if not exist AppList.txt GOTO NOPATHSET
+set "cmd=findstr /R /N "^^" AppList.txt | find /C ":""
 for /f %%a in ('!cmd!') do set number=%%a
 ECHO Entries Stored: %number%
 EndLocal
 GOTO PROMPTUSER
 
 :NOPATHSET
-ECHO Pathlist.txt file has not yet been created.
+ECHO AppList.txt file has not yet been created.
 
 :PROMPTUSER
 ECHO.
 SET /P choice=Type a selection then press ENTER:
 
-::REMOVES LEADING AND TRAILING WHITESPACE
-SetLocal enabledelayedexpansion
-::echo spaces "%choice%"
-FOR /f "tokens=* delims= " %%a in ("%choice%") do set choice=%%a
-FOR /l %%a in (1,1,100) do if "!choice:~-1!"==" " set choice=!choice:~0,-1!
-::echo no spaces "%choice%"
-EndLocal
-::END WHITESPACE REMOVAL
+::REMOVES ALL SPACES
+set choice=%choice: =%
+::END SPACES REMOVAL
 
-IF %choice%==1 GOTO ADDPATH
-IF %choice%==2 GOTO REMOVEPATH
-IF %choice%==3 GOTO READ
+
+IF %choice%==1 GOTO APPLIST
+IF %choice%==2 GOTO LINKLIST
+IF %choice%==3 GOTO README
 IF %choice%==4 GOTO EOF
 IF %choice%=="" GOTO INIT
 
@@ -59,66 +68,267 @@ ECHO "Invalid selection:" %choice%
 PAUSE
 GOTO INIT
 
-:ADDPATH
+:ADDAPP
 CLS
-ECHO Entry to be added:
-::ECHO Example: C:\Users\someUser\Desktop\SomeFolder
-::SetLocal EnableDelayedExpansion
+ECHO ...............................................
+ECHO Add APP
+ECHO ...............................................
 SET /P addEntry=Entry:
 
-::REMOVES LEADING AND TRAILING WHITESPACE
 SetLocal enabledelayedexpansion
-::echo spaces "%addEntry%"
-
-PAUSE
+::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
-
-::echo no spaces "%addEntry%"
-::EndLocal
 ::END WHITESPACE REMOVAL
 
-@echo !addEntry! >> PathList.txt
+@echo !addEntry! >> AppList.txt
 ECHO You added... !addEntry!
 EndLocal
 ECHO.
 PAUSE
-GOTO INIT
+GOTO APPLIST
 
-:REMOVEPATH
+:APPLIST
 CLS
-ECHO Entry number to remove:
-::ECHO Example: C:\Users\someUser\Desktop\SomeFolder
-SetLocal EnableDelayedExpansion
+ECHO ...............................................
+ECHO APPLICATION LIST
+ECHO ...............................................
+if not exist AppList.txt GOTO APPNULL
+type "AppList.txt"|findstr/n ^^ > "temp.txt"
+FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
+GOTO APPPROMPT
+:APPNULL
+ECHO Your list is empty...
+
+:APPPROMPT
+ECHO.
+ECHO [M]ain Menu [A]dd [#]Remove
 SET /P removeEntry=Entry:
-
 CLS
-if not exist PathList.txt GOTO NOPATHSET
-for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !removeEntry! set showRemove= %%H
 
-::remove entry code
+::FAILSAFES
+set removeEntry=%removeEntry: =%
+IF %removeEntry%==M GOTO INIT
+IF %removeEntry%==m GOTO INIT
+IF %removeEntry%==A GOTO ADDAPP
+IF %removeEntry%==a GOTO ADDAPP
+
+::REMOVEAPP
+if not exist AppList.txt GOTO INVALIDAPPSELECT
+
+set "cmd=findstr /R /N "^^" AppList.txt | find /C ":""
+
+SetLocal EnableDelayedExpansion
+for /f %%a in ('!cmd!') do set number=%%a
+if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
+
+::SELECTS THE ENTRY
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" AppList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
+FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove:~0,-1!
+::END WHITESPACE REMOVAL
+
+::REMOVES THE ENTRY
+findstr /v /i /L /c:"!showRemove!" AppList.txt >Temp.txt
+type Temp.txt > AppList.txt
+
+
+REM ::REMOVE APP
+REM type AppList.txt | findstr /v REMOVETHIS
+
 ECHO You removed... !showRemove!
-
 EndLocal
 ECHO.
 PAUSE
-GOTO INIT
+GOTO APPLIST
 
-:READ
+
+
+:ADDLINK
 CLS
-ECHO Entry number to read:
-::ECHO Example: C:\Users\someUser\Desktop\SomeFolder
-SetLocal EnableDelayedExpansion
-SET /P readEntry=Entry:
+ECHO ...............................................
+ECHO Add LINK
+ECHO ...............................................
+SET /P addEntry=Entry:
 
-CLS
-if not exist PathList.txt GOTO NOPATHSET
-for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !readEntry! set showRead= %%H
+SetLocal enabledelayedexpansion
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+::END WHITESPACE REMOVAL
 
-::show the entry for this number
-ECHO The entry is !showRead!
-
+@echo !addEntry! >> LinkList.txt
+ECHO You added... !addEntry!
 EndLocal
+ECHO.
+PAUSE
+GOTO LINKLIST
+
+:LINKLIST
+CLS
+ECHO ...............................................
+ECHO LINK LIST
+ECHO ...............................................
+if not exist LinkList.txt GOTO LINKNULL
+type "LinkList.txt"|findstr/n ^^ > "temp.txt"
+FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
+GOTO LINKPROMPT
+:LINKNULL
+ECHO Your list is empty...
+:LINKPROMPT
+ECHO.
+ECHO [M]ain Menu [A]dd [#]Remove
+SET /P removeEntry=Entry:
+CLS
+
+::FAILSAFES
+set removeEntry=%removeEntry: =%
+IF %removeEntry%==M GOTO INIT
+IF %removeEntry%==m GOTO INIT
+IF %removeEntry%==A GOTO ADDLINK
+IF %removeEntry%==a GOTO ADDLINK
+
+::REMOVELINK
+if not exist LinkList.txt GOTO INVALIDLINKSELECT
+
+set "cmd=findstr /R /N "^^" LinkList.txt | find /C ":""
+
+SetLocal EnableDelayedExpansion
+for /f %%a in ('!cmd!') do set number=%%a
+if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
+
+::SELECTS THE ENTRY
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" LinkList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
+FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove:~0,-1!
+::END WHITESPACE REMOVAL
+
+::REMOVES THE ENTRY
+findstr /v /i /L /c:"!showRemove!" LinkList.txt >Temp.txt
+type Temp.txt > LinkList.txt
+
+
+::removal code
+type LinkList.txt | findstr /v REMOVETHIS
+
+ECHO You removed... !showRemove!
+EndLocal
+ECHO.
+PAUSE
+GOTO LINKLIST
+
+
+
+:ADDADAPP
+CLS
+ECHO ...............................................
+ECHO Add Admin APP
+ECHO ...............................................
+SET /P addEntry=Entry:
+
+SetLocal enabledelayedexpansion
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+::END WHITESPACE REMOVAL
+
+@echo !addEntry! >> AdAppList.txt
+ECHO You added... !addEntry!
+EndLocal
+ECHO.
+PAUSE
+GOTO ADAPPLIST
+
+:ADAPPLIST
+CLS
+ECHO ...............................................
+ECHO APPLICATION LIST
+ECHO ...............................................
+if not exist AdAppList.txt GOTO APPNULL
+type "AdAppList.txt"|findstr/n ^^ > "temp.txt"
+FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
+GOTO ADAPPPROMPT
+:ADAPPNULL
+ECHO Your list is empty...
+
+:ADAPPPROMPT
+ECHO.
+ECHO [M]ain Menu [A]dd [#]Remove
+SET /P removeEntry=Entry:
+CLS
+
+::FAILSAFES
+set removeEntry=%removeEntry: =%
+IF %removeEntry%==M GOTO INIT
+IF %removeEntry%==m GOTO INIT
+IF %removeEntry%==A GOTO ADDAPP
+IF %removeEntry%==a GOTO ADDAPP
+
+::REMOVEAPP
+if not exist AdAppList.txt GOTO INVALIDAPPSELECT
+
+set "cmd=findstr /R /N "^^" AdAppList.txt | find /C ":""
+
+SetLocal EnableDelayedExpansion
+for /f %%a in ('!cmd!') do set number=%%a
+if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
+
+::SELECTS THE ENTRY
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" AdAppList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
+FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove:~0,-1!
+::END WHITESPACE REMOVAL
+
+::REMOVES THE ENTRY
+findstr /v /i /L /c:"!showRemove!" AdAppList.txt >Temp.txt
+type Temp.txt > AdAppList.txt
+
+
+ECHO You removed... !showRemove!
+EndLocal
+ECHO.
+PAUSE
+GOTO ADAPPLIST
+
+
+:INVALIDAPPSELECT
+CLS
+ECHO Invalid Selection
+PAUSE
+GOTO APPLIST
+
+:INVALIDLINKSELECT
+CLS
+ECHO Invalid Selection
+PAUSE
+GOTO LINKLIST
+
+:INVALIDADAPPSELECT
+CLS
+ECHO Invalid Selection
+PAUSE
+GOTO APPLIST
+
+
+:README
+CLS
+ECHO.
+ECHO - This program manages apps and links.  The eSolution Center does not
+ECHO - offer support for this program.  Please be mindful of its location and use.
+ECHO.
+ECHO ...............................................
+ECHO 1 - I have no description for this yet.
+ECHO 2 - I have no description for this yet.
+ECHO 3 - I have no description for this yet.
+ECHO 4 - I have no description for this yet.
+ECHO 5 - I have no description for this yet.
+ECHO 6 - I have no description for this yet.
 ECHO.
 PAUSE
 GOTO INIT
