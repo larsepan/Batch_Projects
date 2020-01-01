@@ -4,7 +4,7 @@
 @ECHO OFF
 CLS
 
-:SETUP
+:INIT
 SET location=
 SET choice=
 
@@ -40,28 +40,45 @@ IF %choice%==1 GOTO DESTINATION
 IF %choice%==2 GOTO MOVEFILES
 IF %choice%==3 GOTO README
 IF %choice%==4 GOTO EOF
-IF %choice%=="" GOTO SETUP
+IF %choice%=="" GOTO INIT
 
 :INVALID
 CLS
 ECHO "Invalid selection:" %choice%
 PAUSE
-GOTO SETUP
+GOTO INIT
 
 :DESTINATION
 CLS
 ECHO Type out the complete folder path:
 ECHO Example: C:\Users\someUser\Desktop\SomeFolder
-SET /P Path=Path: 
-@echo %Path% > TempPath.txt
-ECHO You typed %Path%
+SetLocal EnableDelayedExpansion
+SET /P Path=Path:
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+::SetLocal enabledelayedexpansion
+::echo spaces "%Path%"
+FOR /f "tokens=* delims= " %%a in ("%Path%") do set Path=%%a
+FOR /l %%a in (1,1,100) do if "!Path:~-1!"==" " set Path=!Path:~0,-1!
+::echo no spaces "%Path%"
+::EndLocal
+::END WHITESPACE REMOVAL
+
+
+@echo !Path! > TempPath.txt
+::@echo !PathQ! >> TempPath.txt
+:: ECHO is off result
+ECHO You typed !Path!
+::ECHO You also, apparently typed !PathQ!
 :: If the path's last folder does not exist, ask whether to create it
-if not exist %Path% GOTO PATHPROMPT
-@echo %Path% > MoveFilePath.txt
+if not exist !Path! GOTO PATHPROMPT
+@echo !Path! > MoveFilePath.txt
+::@echo !PathQ! > MoveFilePath.txt
+EndLocal
 ECHO Process Complete.
 ECHO.
 PAUSE
-GOTO SETUP
+GOTO INIT
 
 :PATHPROMPT
 ECHO That path does not exist.
@@ -82,37 +99,50 @@ GOTO DESTINATION
 :CREATEPATH
 SetLocal EnableDelayedExpansion
 FOR /F "delims=" %%i in (TempPath.txt) do set location=!location! %%i
-mkdir %location%
 @echo %location% > MoveFilePath.txt
+ECHO location is ... !location!
+PAUSE
+mkdir "%location%"
+
 EndLocal
 ECHO Process Complete.
 ECHO.
 PAUSE
-GOTO SETUP
+GOTO INIT
 
 :MOVEFILES
 CLS
 SetLocal EnableDelayedExpansion
 if not exist MoveFilePath.txt GOTO NOTEXIST
 FOR /F "delims=" %%i in (MoveFilePath.txt) do set location=!location! %%i
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+::SetLocal enabledelayedexpansion
+::echo spaces "%location%"
+FOR /f "tokens=* delims= " %%a in ("%location%") do set location=%%a
+FOR /l %%a in (1,1,100) do if "!location:~-1!"==" " set location=!location:~0,-1!
+::echo no spaces "%location%"
+::EndLocal
+::END WHITESPACE REMOVAL
+
 ECHO Moving files...
 ::DESIGNATED FILE TYPES LIST
 ::For any other filetypes you want moved, just add to/edit the list below 
-MOVE %userprofile%\Desktop\*.png %location%
-MOVE %userprofile%\Desktop\*.jpg %location%
-MOVE %userprofile%\Desktop\*.msg %location%
+MOVE %userprofile%\Desktop\*.png "!location!"
+MOVE %userprofile%\Desktop\*.jpg "!location!"
+MOVE %userprofile%\Desktop\*.msg "!location!"
 ::END DESGINATED FILE TYPES LIST
 EndLocal
 ECHO Process Complete.
 ECHO.
 PAUSE
-GOTO SETUP
+GOTO INIT
 
 :NOTEXIST
 CLS
 ECHO That path does not exist.  Please set a destination path first.
 PAUSE
-GOTO SETUP
+GOTO INIT
 
 :README
 CLS
@@ -129,4 +159,4 @@ ECHO 5 - Make sure the path is correct and always backup your files.
 ECHO 6 - Choose the move files to destination folder.
 ECHO.
 PAUSE
-GOTO SETUP
+GOTO INIT
