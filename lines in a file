@@ -69,25 +69,18 @@ SET /P addEntry=Entry:
 ::REMOVES LEADING AND TRAILING WHITESPACE
 SetLocal enabledelayedexpansion
 ::echo spaces "%addEntry%"
-ECHO You typed !addEntry!
+
 PAUSE
-REM FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
-REM FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 
 ::echo no spaces "%addEntry%"
 ::EndLocal
 ::END WHITESPACE REMOVAL
 
-::@echo !addEntry! >> TempPath.txt
-::@echo !PathQ! >> TempPath.txt
-:: ECHO is off result
-ECHO You typed !addEntry!
-::ECHO You also, apparently typed !PathQ!
-:: If the path's last folder does not exist, ask whether to create it
 @echo !addEntry! >> PathList.txt
-::@echo !PathQ! > PathList.txt
+ECHO You added... !addEntry!
 EndLocal
-ECHO Process Complete.
 ECHO.
 PAUSE
 GOTO INIT
@@ -102,10 +95,12 @@ SET /P removeEntry=Entry:
 CLS
 if not exist PathList.txt GOTO NOPATHSET
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !removeEntry! set showRemove= %%H
-ECHO The entry is !showRemove!
+
 ::remove entry code
+ECHO You removed... !showRemove!
 
 EndLocal
+ECHO.
 PAUSE
 GOTO INIT
 
@@ -119,8 +114,11 @@ SET /P readEntry=Entry:
 CLS
 if not exist PathList.txt GOTO NOPATHSET
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" PathList.txt') do if %%G equ !readEntry! set showRead= %%H
+
+::show the entry for this number
 ECHO The entry is !showRead!
 
 EndLocal
+ECHO.
 PAUSE
 GOTO INIT
