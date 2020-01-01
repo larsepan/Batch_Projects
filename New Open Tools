@@ -18,10 +18,10 @@ ECHO.
 ECHO.
 ECHO 1 - Set a Username
 ECHO 2 - Login to Apps
-ECHO 2 - EXIT
+ECHO 3 - EXIT
 ECHO.
 
-:CURRENT USERNAME
+:CURRENTUSERNAME
 SetLocal EnableDelayedExpansion
 if not exist OpenTools.txt GOTO NOUSERSET
 FOR /F "delims=" %%i in (OpenTools.txt) do set UN=!UN! %%i
@@ -35,6 +35,16 @@ ECHO You have not yet set a username.
 :PROMPTUSER
 ECHO.
 SET /P choice=Type a selection then press ENTER:
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+SetLocal enabledelayedexpansion
+::echo spaces "%choice%"
+FOR /f "tokens=* delims= " %%a in ("%choice%") do set choice=%%a
+FOR /l %%a in (1,1,100) do if "!choice:~-1!"==" " set choice=!choice:~0,-1!
+::echo no spaces "%choice%"
+EndLocal
+::END WHITESPACE REMOVAL
+
 IF %choice%==1 GOTO SETUSER
 IF %choice%==2 GOTO ADLOGIN
 IF %choice%==3 GOTO EOF
@@ -58,7 +68,6 @@ REM SET /P Path=Path:
 REM SET PathQ="!Path!"
 REM @echo !Path! > OpenTools.txt
 @echo !UN! > OpenTools.txt
-:: ECHO is off result
 ECHO You typed !UN!
 :: If the path's last folder does not exist, ask whether to create it
 REM if not exist !Path! GOTO PATHPROMPT
@@ -69,24 +78,18 @@ REM ECHO Process Complete.
 ECHO.
 PAUSE
 GOTO INIT
-REM SET /P PW=What Is Your Password?
-REM SET "ISGOOD=PASS"
-
-REM FOR /F %%H IN ('NET USE "\\Server\home$\%UN%" /User:[The Domain]\%UN% %PW% 2^>^&1 ^| Find /I "System error 1311 has occurred."') DO SET "ISGOOD=FAIL"
-
-REM IF /I "%ISGOOD%"=="FAIL" GOTO :EOF
 
 :ADLOGIN
 CLS
 SetLocal EnableDelayedExpansion
 if not exist OpenTools.txt GOTO NOTEXIST
 FOR /F "delims=" %%i in (OpenTools.txt) do set UN=!UN! %%i
-REM SET=UN "!UN!"
-
+:: set var=%var: =% removes all spaces
+SET UN=%UN: =%
+::PAUSE
+::ECHO runas called with !UN!
 PAUSE
-ECHO runas called with !UN!
-PAUSE
-RUNAS /user:bsci\!UN! A_Execs.bat
+RUNAS /user:bsci\!UN! "C:\Users\guttorl\Desktop\Batch Testings\A_Execs.bat"
 EndLocal
 ECHO Process Complete.
 ECHO.
