@@ -25,27 +25,28 @@ SET choice=
 CLS
 ECHO.
 ECHO ...............................................
-ECHO FileList Test
+ECHO Generate Custom Start Tools Batch File
 ECHO ...............................................
 ECHO. 
 ECHO.
 ECHO 1 - Manage Apps
 ECHO 2 - Manage Links
-ECHO 3 - Readme
-ECHO 4 - Exit
+ECHO 3 - Generate Batch File
+ECHO 4 - Readme
+ECHO 5 - Exit
 ECHO.
 
-:ENTRYNO
-SetLocal EnableDelayedExpansion
-if not exist AppList.txt GOTO NOPATHSET
-set "cmd=findstr /R /N "^^" AppList.txt | find /C ":""
-for /f %%a in ('!cmd!') do set number=%%a
-ECHO Entries Stored: %number%
-EndLocal
-GOTO PROMPTUSER
+REM :ENTRYNO
+REM SetLocal EnableDelayedExpansion
+REM if not exist ListApp.txt GOTO NOPATHSET
+REM set "cmd=findstr /R /N "^^" ListApp.txt | find /C ":""
+REM for /f %%a in ('!cmd!') do set numberAppList=%%a
+REM ECHO Entries Stored: %numberAppList%
+REM EndLocal
+REM GOTO PROMPTUSER
 
-:NOPATHSET
-ECHO AppList.txt file has not yet been created.
+REM :PATHS
+REM ECHO ListApp.txt file has not yet been created.
 
 :PROMPTUSER
 ECHO.
@@ -58,8 +59,10 @@ set choice=%choice: =%
 
 IF %choice%==1 GOTO APPLIST
 IF %choice%==2 GOTO LINKLIST
-IF %choice%==3 GOTO README
-IF %choice%==4 GOTO EOF
+REM IF %choice%==3 GOTO ADAPPLIST
+IF %choice%==3 GOTO GENERATE
+IF %choice%==4 GOTO README
+IF %choice%==5 GOTO EOF
 IF %choice%=="" GOTO INIT
 
 :INVALID
@@ -81,7 +84,7 @@ FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
 
-@echo !addEntry! >> AppList.txt
+@echo !addEntry! >> ListApp.txt
 ECHO You added... !addEntry!
 EndLocal
 ECHO.
@@ -93,8 +96,8 @@ CLS
 ECHO ...............................................
 ECHO APPLICATION LIST
 ECHO ...............................................
-if not exist AppList.txt GOTO APPNULL
-type "AppList.txt"|findstr/n ^^ > "temp.txt"
+if not exist ListApp.txt GOTO APPNULL
+type "ListApp.txt"|findstr/n ^^ > "temp.txt"
 FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
 GOTO APPPROMPT
 :APPNULL
@@ -114,16 +117,16 @@ IF %removeEntry%==A GOTO ADDAPP
 IF %removeEntry%==a GOTO ADDAPP
 
 ::REMOVEAPP
-if not exist AppList.txt GOTO INVALIDAPPSELECT
+if not exist ListApp.txt GOTO INVALIDAPPSELECT
 
-set "cmd=findstr /R /N "^^" AppList.txt | find /C ":""
+set "cmd=findstr /R /N "^^" ListApp.txt | find /C ":""
 
 SetLocal EnableDelayedExpansion
 for /f %%a in ('!cmd!') do set number=%%a
 if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
 
 ::SELECTS THE ENTRY
-for /f "tokens=1*delims=:" %%G in ('findstr /n "^" AppList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" ListApp.txt') do if %%G equ !removeEntry! set showRemove= %%H
 
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
@@ -131,12 +134,12 @@ FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove
 ::END WHITESPACE REMOVAL
 
 ::REMOVES THE ENTRY
-findstr /v /i /L /c:"!showRemove!" AppList.txt >Temp.txt
-type Temp.txt > AppList.txt
+findstr /v /i /L /c:"!showRemove!" ListApp.txt >Temp.txt
+type Temp.txt > ListApp.txt
 
 
 REM ::REMOVE APP
-REM type AppList.txt | findstr /v REMOVETHIS
+REM type ListApp.txt | findstr /v REMOVETHIS
 
 ECHO You removed... !showRemove!
 EndLocal
@@ -159,7 +162,7 @@ FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
 
-@echo !addEntry! >> LinkList.txt
+@echo !addEntry! >> ListLink.txt
 ECHO You added... !addEntry!
 EndLocal
 ECHO.
@@ -171,8 +174,8 @@ CLS
 ECHO ...............................................
 ECHO LINK LIST
 ECHO ...............................................
-if not exist LinkList.txt GOTO LINKNULL
-type "LinkList.txt"|findstr/n ^^ > "temp.txt"
+if not exist ListLink.txt GOTO LINKNULL
+type "ListLink.txt"|findstr/n ^^ > "temp.txt"
 FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
 GOTO LINKPROMPT
 :LINKNULL
@@ -191,16 +194,16 @@ IF %removeEntry%==A GOTO ADDLINK
 IF %removeEntry%==a GOTO ADDLINK
 
 ::REMOVELINK
-if not exist LinkList.txt GOTO INVALIDLINKSELECT
+if not exist ListLink.txt GOTO INVALIDLINKSELECT
 
-set "cmd=findstr /R /N "^^" LinkList.txt | find /C ":""
+set "cmd=findstr /R /N "^^" ListLink.txt | find /C ":""
 
 SetLocal EnableDelayedExpansion
 for /f %%a in ('!cmd!') do set number=%%a
 if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
 
 ::SELECTS THE ENTRY
-for /f "tokens=1*delims=:" %%G in ('findstr /n "^" LinkList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" ListLink.txt') do if %%G equ !removeEntry! set showRemove= %%H
 
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
@@ -208,12 +211,12 @@ FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove
 ::END WHITESPACE REMOVAL
 
 ::REMOVES THE ENTRY
-findstr /v /i /L /c:"!showRemove!" LinkList.txt >Temp.txt
-type Temp.txt > LinkList.txt
+findstr /v /i /L /c:"!showRemove!" ListLink.txt >Temp.txt
+type Temp.txt > ListLink.txt
 
 
 ::removal code
-type LinkList.txt | findstr /v REMOVETHIS
+type ListLink.txt | findstr /v REMOVETHIS
 
 ECHO You removed... !showRemove!
 EndLocal
@@ -236,7 +239,7 @@ FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
 
-@echo !addEntry! >> AdAppList.txt
+@echo !addEntry! >> ListAdApp.txt
 ECHO You added... !addEntry!
 EndLocal
 ECHO.
@@ -248,8 +251,8 @@ CLS
 ECHO ...............................................
 ECHO APPLICATION LIST
 ECHO ...............................................
-if not exist AdAppList.txt GOTO APPNULL
-type "AdAppList.txt"|findstr/n ^^ > "temp.txt"
+if not exist ListAdApp.txt GOTO ADAPPNULL
+type "ListAdApp.txt"|findstr/n ^^ > "temp.txt"
 FOR /F "tokens=*" %%a in (temp.txt) do (echo %%a)
 GOTO ADAPPPROMPT
 :ADAPPNULL
@@ -265,20 +268,20 @@ CLS
 set removeEntry=%removeEntry: =%
 IF %removeEntry%==M GOTO INIT
 IF %removeEntry%==m GOTO INIT
-IF %removeEntry%==A GOTO ADDAPP
-IF %removeEntry%==a GOTO ADDAPP
+IF %removeEntry%==A GOTO ADDADAPP
+IF %removeEntry%==a GOTO ADDADAPP
 
 ::REMOVEAPP
-if not exist AdAppList.txt GOTO INVALIDAPPSELECT
+if not exist ListAdApp.txt GOTO INVALIDAPPSELECT
 
-set "cmd=findstr /R /N "^^" AdAppList.txt | find /C ":""
+set "cmd=findstr /R /N "^^" ListAdApp.txt | find /C ":""
 
 SetLocal EnableDelayedExpansion
 for /f %%a in ('!cmd!') do set number=%%a
 if !removeEntry! GTR !number! GOTO INVALIDAPPSELECT
 
 ::SELECTS THE ENTRY
-for /f "tokens=1*delims=:" %%G in ('findstr /n "^" AdAppList.txt') do if %%G equ !removeEntry! set showRemove= %%H
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" ListAdApp.txt') do if %%G equ !removeEntry! set showRemove= %%H
 
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%showRemove%") do set showRemove=%%a
@@ -286,8 +289,8 @@ FOR /l %%a in (1,1,100) do if "!showRemove:~-1!"==" " set showRemove=!showRemove
 ::END WHITESPACE REMOVAL
 
 ::REMOVES THE ENTRY
-findstr /v /i /L /c:"!showRemove!" AdAppList.txt >Temp.txt
-type Temp.txt > AdAppList.txt
+findstr /v /i /L /c:"!showRemove!" ListAdApp.txt >Temp.txt
+type Temp.txt > ListAdApp.txt
 
 
 ECHO You removed... !showRemove!
@@ -315,7 +318,6 @@ ECHO Invalid Selection
 PAUSE
 GOTO APPLIST
 
-
 :README
 CLS
 ECHO.
@@ -332,3 +334,49 @@ ECHO 6 - I have no description for this yet.
 ECHO.
 PAUSE
 GOTO INIT
+
+:GENERATE
+CLS
+ECHO.
+ECHO GENERATING CUSTOM OPEN TOOLS BATCH
+ECHO ...............................................
+if not exist ListApp.txt GOTO GENLINK
+
+::Copy entries, snip them of leading/trailing whitespace. Add Start designation with quotes around copied paths.
+
+::FOR /F "tokens=*" %%a in (ListApp.txt) do ("!addEntry!" >> NewOpenTools.txt %%a)
+
+::How's this?
+
+REM REM REM @echo off
+REM REM REM (
+  REM REM REM for /f "tokens=1-7,9-11" %%A in (semi-final.txt) do (
+    REM REM REM for /f "tokens=2" %%X in ('findstr /bl "%%G," codes.txt') do (
+      REM REM REM echo %%A,%%B,%%C,%%D,%%E,%%F,%%X,%%H,%%I,%%J
+    REM REM REM )
+  REM REM REM )
+REM REM REM )>final.txt
+
+REM SetLocal EnableDelayedExpansion
+REM for /f "tokens=* delims= " %%a in (ListApp.txt) do (
+REM set /a
+REM echo "%%a">>NewOpenTools.txt
+REM )
+REM EndLocal
+
+SetLocal EnableDelayedExpansion
+for /f "tokens=* delims= " %%a in (ListApp.txt) do (
+
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" ListApp.txt') do if %%G equ !genEntry! set showRemove= %%H
+
+
+PAUSE
+
+:GENLINK
+if not exist ListLink.txt GOTO GENADAPP
+
+:GENADAPP
+if not exist ListAdApp.txt GOTO FINGEN
+
+:FINGEN
+if not exist ListAdApp.txt GOTO INIT
