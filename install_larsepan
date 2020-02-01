@@ -1,0 +1,13 @@
+:: This program install CleanUp Desktop
+:: by Larsepan
+
+@ECHO OFF
+CLS
+
+if not exist "C:\Larsepan\" mkdir C:\Larsepan
+
+if not exist "C:\Larsepan\CleanDesktop\" mkdir C:\Larsepan\CleanDesktop
+
+ECHO Process Complete.
+ECHO.
+PAUSE
