@@ -1,0 +1,218 @@
+:: Simple Mass PEX Decompiler - (Using Champollion)
+:: by Larsepan
+:: Champollion is an excellent PEX to Papyrus decomplier by li1nx.
+:: https://www.nexusmods.com/skyrim/mods/35307
+
+
+@ECHO OFF
+CLS
+
+:SETUP
+SET location=
+SET choice=
+
+
+
+:MENU
+CLS
+ECHO.
+ECHO ...............................................
+ECHO  Simple Mass PEX Decompiler - (Using Champollion)
+ECHO ...............................................
+ECHO. 
+ECHO.
+ECHO 1 - Decompile Pex
+ECHO 2 - Assign Input/Output/Champollion Paths
+ECHO 3 - EXIT
+ECHO.
+
+:CHECKPATHS
+SetLocal EnableDelayedExpansion
+if not exist Settings.txt GOTO NOPATHSET1
+set "cmd=findstr /R /N "^^" Settings.txt | find /C ":""
+for /f %%a in ('!cmd!') do set number=%%a
+ECHO Entries Stored: %number%
+IF !number! LSS 2 GOTO NOPATHSET1
+IF !number! LSS 3 GOTO NOPATHSET2
+EndLocal
+GOTO PROMPTUSER3
+
+:NOPATHSET1
+ECHO Please assign the required paths
+GOTO PROMPTUSER1
+
+:NOPATHSET2
+ECHO You have not assigned the Champollion.exe path
+GOTO PROMPTUSER2
+
+:PROMPTUSER1
+ECHO.
+SET /P choice=Type a selection then press ENTER:
+IF %choice%==1 GOTO NOPATHSET3
+IF %choice%==2 GOTO SETINPUT
+IF %choice%==3 GOTO EOF
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+GOTO SETUP
+
+:NOPATHSET3
+CLS
+ECHO Please assign all required folder paths
+PAUSE
+GOTO SETUP
+
+:NOPATHSET4
+CLS
+ECHO You must assign the Input/Output paths first.
+PAUSE
+GOTO SETUP
+
+:PROMPTUSER2
+ECHO.
+SET /P choice=Type a selection then press ENTER:
+IF %choice%==1 GOTO NOPATHSET3
+IF %choice%==2 GOTO SETINPUT
+IF %choice%==3 GOTO EOF
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+GOTO SETUP
+
+:PROMPTUSER3
+ECHO.
+SET /P choice=Type a selection then press ENTER:
+IF %choice%==1 GOTO DECOMPILE
+IF %choice%==2 GOTO SETINPUT
+IF %choice%==3 GOTO EOF
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+GOTO SETUP
+
+:SETINPUT
+break>Settings.txt
+CLS
+ECHO Let's set the input folder...
+ECHO..
+SET /P addEntry=Path:
+
+SetLocal enabledelayedexpansion
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+::END WHITESPACE REMOVAL
+
+@echo !addEntry! >> Settings.txt
+
+ECHO Your input folder is... !addEntry!
+EndLocal
+ECHO.
+PAUSE
+CLS
+ECHO Let's set the output folder...
+ECHO..
+
+:SETOUTPUT
+SET /P addEntry=Path:
+SetLocal enabledelayedexpansion
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+::END WHITESPACE REMOVAL
+
+@echo !addEntry! >> Settings.txt
+ECHO Your output folder is... !addEntry!
+EndLocal
+ECHO.
+PAUSE
+REM GOTO SETUP
+
+:SETCHAMPLOC
+CLS
+ECHO What folder is Champollion.exe located within?
+ECHO..
+SET /P addEntry=Path:
+SetLocal enabledelayedexpansion
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
+FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
+::END WHITESPACE REMOVAL
+
+@echo !addEntry! >> Settings.txt
+ECHO Champollion.exe's folder is... !addEntry!
+EndLocal
+ECHO.
+PAUSE
+GOTO SETUP
+
+
+
+:DECOMPILE
+CLS
+
+SetLocal EnableDelayedExpansion
+::INPUT PATH
+
+set /p inLoc= <Settings.txt
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%inLoc%") do set inLoc=%%a
+FOR /l %%a in (1,1,100) do if "!inLoc:~-1!"==" " set inLoc=!inLoc:~0,-1!
+
+
+
+
+::OUTPUT PATH
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 2 set outLoc= %%H
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%outLoc%") do set outLoc=%%a
+FOR /l %%a in (1,1,100) do if "!outLoc:~-1!"==" " set outLoc=!outLoc:~0,-1!
+
+
+
+
+::CHAMPOLLION PATH
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 3 set champLoc= %%H
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%champLoc%") do set champLoc=%%a
+FOR /l %%a in (1,1,100) do if "!champLoc:~-1!"==" " set champLoc=!champLoc:~0,-1!
+
+REM pause
+
+CALL cmd /K ""!champLoc!\Champollion.exe" "!inLoc!"  -p "!outLoc!""
+
+REM EndLocal
+REM ECHO Process Complete.
+REM ECHO.
+REM PAUSE
+REM GOTO SETUP
+
+:README
+
+ECHO This is a simple batch menu system for decompling entire folders of PEXs. 
+ECHO Champollion is an excellent PEX to Papyrus decomplier by li1nx.
+ECHO https://www.nexusmods.com/skyrim/mods/35307
+ECHO For use, just enter three folder paths.
+ECHO For example:
+ECHO F:\Some Folder\Input\
+ECHO F:\Some Folder\Output\
+ECHO F:\Some Folder\Champollion\
+ECHO Have fun! -Larsepan
+
+
+
+
+
+
+
+
+
