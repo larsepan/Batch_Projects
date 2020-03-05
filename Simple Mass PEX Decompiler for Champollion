@@ -24,6 +24,7 @@ ECHO.
 ECHO 1 - Decompile Pex
 ECHO 2 - Assign Input/Output/Champollion Paths
 ECHO 3 - EXIT
+ECHO 4 - README
 ECHO.
 
 :CHECKPATHS
@@ -31,7 +32,7 @@ SetLocal EnableDelayedExpansion
 if not exist Settings.txt GOTO NOPATHSET1
 set "cmd=findstr /R /N "^^" Settings.txt | find /C ":""
 for /f %%a in ('!cmd!') do set number=%%a
-ECHO Entries Stored: %number%
+REM ECHO Entries Stored: %number%
 IF !number! LSS 2 GOTO NOPATHSET1
 IF !number! LSS 3 GOTO NOPATHSET2
 EndLocal
@@ -51,6 +52,7 @@ SET /P choice=Type a selection then press ENTER:
 IF %choice%==1 GOTO NOPATHSET3
 IF %choice%==2 GOTO SETINPUT
 IF %choice%==3 GOTO EOF
+IF %choice%==4 GOTO README
 
 :INVALID
 CLS
@@ -76,6 +78,7 @@ SET /P choice=Type a selection then press ENTER:
 IF %choice%==1 GOTO NOPATHSET3
 IF %choice%==2 GOTO SETINPUT
 IF %choice%==3 GOTO EOF
+IF %choice%==4 GOTO README
 
 :INVALID
 CLS
@@ -89,6 +92,7 @@ SET /P choice=Type a selection then press ENTER:
 IF %choice%==1 GOTO DECOMPILE
 IF %choice%==2 GOTO SETINPUT
 IF %choice%==3 GOTO EOF
+IF %choice%==4 GOTO README
 
 :INVALID
 CLS
@@ -197,17 +201,24 @@ REM PAUSE
 REM GOTO SETUP
 
 :README
-
+CLS
+ECHO.
+ECHO ...............................................
 ECHO This is a simple batch menu system for decompling entire folders of PEXs. 
 ECHO Champollion is an excellent PEX to Papyrus decomplier by li1nx.
 ECHO https://www.nexusmods.com/skyrim/mods/35307
+ECHO.
 ECHO For use, just enter three folder paths.
 ECHO For example:
+ECHO.
 ECHO F:\Some Folder\Input\
 ECHO F:\Some Folder\Output\
 ECHO F:\Some Folder\Champollion\
+ECHO.
 ECHO Have fun! -Larsepan
-
+ECHO.
+PAUSE
+GOTO SETUP
 
 
 
