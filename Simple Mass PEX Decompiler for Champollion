@@ -156,8 +156,6 @@ ECHO.
 PAUSE
 GOTO SETUP
 
-
-
 :DECOMPILE
 CLS
 
@@ -170,18 +168,12 @@ set /p inLoc= <Settings.txt
 FOR /f "tokens=* delims= " %%a in ("%inLoc%") do set inLoc=%%a
 FOR /l %%a in (1,1,100) do if "!inLoc:~-1!"==" " set inLoc=!inLoc:~0,-1!
 
-
-
-
 ::OUTPUT PATH
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 2 set outLoc= %%H
 
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%outLoc%") do set outLoc=%%a
 FOR /l %%a in (1,1,100) do if "!outLoc:~-1!"==" " set outLoc=!outLoc:~0,-1!
-
-
-
 
 ::CHAMPOLLION PATH
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 3 set champLoc= %%H
