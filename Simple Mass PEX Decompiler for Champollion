@@ -11,8 +11,6 @@ CLS
 SET location=
 SET choice=
 
-
-
 :MENU
 CLS
 ECHO.
@@ -112,9 +110,7 @@ SetLocal enabledelayedexpansion
 FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
-
 @echo !addEntry! >> Settings.txt
-
 ECHO Your input folder is... !addEntry!
 EndLocal
 ECHO.
@@ -130,7 +126,6 @@ SetLocal enabledelayedexpansion
 FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
-
 @echo !addEntry! >> Settings.txt
 ECHO Your output folder is... !addEntry!
 EndLocal
@@ -148,7 +143,6 @@ SetLocal enabledelayedexpansion
 FOR /f "tokens=* delims= " %%a in ("%addEntry%") do set addEntry=%%a
 FOR /l %%a in (1,1,100) do if "!addEntry:~-1!"==" " set addEntry=!addEntry:~0,-1!
 ::END WHITESPACE REMOVAL
-
 @echo !addEntry! >> Settings.txt
 ECHO Champollion.exe's folder is... !addEntry!
 EndLocal
@@ -158,26 +152,22 @@ GOTO SETUP
 
 :DECOMPILE
 CLS
-
 SetLocal EnableDelayedExpansion
+
 ::INPUT PATH
-
 set /p inLoc= <Settings.txt
-
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%inLoc%") do set inLoc=%%a
 FOR /l %%a in (1,1,100) do if "!inLoc:~-1!"==" " set inLoc=!inLoc:~0,-1!
 
 ::OUTPUT PATH
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 2 set outLoc= %%H
-
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%outLoc%") do set outLoc=%%a
 FOR /l %%a in (1,1,100) do if "!outLoc:~-1!"==" " set outLoc=!outLoc:~0,-1!
 
 ::CHAMPOLLION PATH
 for /f "tokens=1*delims=:" %%G in ('findstr /n "^" Settings.txt') do if %%G equ 3 set champLoc= %%H
-
 ::REMOVES LEADING AND TRAILING WHITESPACE
 FOR /f "tokens=* delims= " %%a in ("%champLoc%") do set champLoc=%%a
 FOR /l %%a in (1,1,100) do if "!champLoc:~-1!"==" " set champLoc=!champLoc:~0,-1!
