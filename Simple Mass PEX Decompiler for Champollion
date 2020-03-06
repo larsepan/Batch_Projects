@@ -21,10 +21,10 @@ ECHO  Simple Mass PEX Decompiler - (Using Champollion)
 ECHO ...............................................
 ECHO. 
 ECHO.
-ECHO 1 - Decompile Pex
+ECHO 1 - MASS DECOMPILE
 ECHO 2 - Assign Input/Output/Champollion Paths
-ECHO 3 - EXIT
-ECHO 4 - README
+ECHO 3 - Exit
+ECHO 4 - ReadMe
 ECHO.
 
 :CHECKPATHS
