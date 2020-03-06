@@ -1,0 +1,85 @@
+::This script changes spaces into lines for file names
+::It only affects all files within the same folder
+:: by Larsepan
+@ECHO OFF
+CLS
+
+
+:MENU
+CLS
+ECHO.
+ECHO ...............................................
+ECHO  SPACES TO _LINES_ 
+ECHO ...............................................
+ECHO. 
+ECHO.
+ECHO 1 - Turn spaces into lines
+ECHO 2 - Turn lines into spaces
+ECHO 3 - Readme
+ECHO 4 - EXIT
+ECHO.
+
+SET /P choice=Type 1 or 2 then press ENTER:
+IF %choice%==1 GOTO LINES
+IF %choice%==2 GOTO SPACES
+IF %choice%==3 GOTO README
+IF %choice%==4 GOTO EOF
+
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+SET choice=
+GOTO MENU
+
+
+:LINES
+SETLOCAL enabledelayedexpansion
+SET "Pattern= "
+SET "Replace=_"
+For %%a in (*.pdf) Do (
+    Set "File=%%~a"
+    Ren "%%a" "!File:%Pattern%=%Replace%!"
+)
+ENDLOCAL
+CLS
+ECHO Process Complete.
+ECHO.
+PAUSE
+GOTO MENU
+
+
+:SPACES
+SETLOCAL enabledelayedexpansion
+SET "Pattern=_"
+SET "Replace= "
+For %%a in (*.pdf) Do (
+    Set "File=%%~a"
+    Ren "%%a" "!File:%Pattern%=%Replace%!"
+)
+ENDLOCAL
+CLS
+ECHO Process Complete.
+ECHO.
+PAUSE
+GOTO MENU
+
+
+:README
+CLS
+ECHO.
+ECHO - This program targets ALL pdf files in the same folder as
+ECHO - the SpacesToLines.bat file.  The eSolution Center does not
+ECHO - offer support for this program.  Please be mindful of its
+ECHO - location and use.
+ECHO.
+ECHO ...............................................
+ECHO 1 - Create a folder for pdf files to change names in.
+ECHO 2 - Place the SpacesToLines.bat file in there.
+ECHO 3 - Place all pdfs you want renamed within the folder.
+ECHO 4 - Double click the SpacesToLines bat file.
+ECHO 5 - Choose the desired change from the menu.
+ECHO.
+PAUSE
+GOTO MENU
