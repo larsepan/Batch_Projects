@@ -1,0 +1,9 @@
+@ECHO OFF
+
+::CHECK FOR LARGE FILES
+::1073741824 = 1GB / 1048576 = 1MB
+SET amount=1048576
+REM forfiles /P c:\ /S /M * /C "cmd /c if @fsize GEQ %amount% echo @path" > largefiles.txt
+forfiles /S /M * /C "cmd /c if @fsize GEQ %amount% echo @path" > largefiles.txt
+ECHO Process Complete.
+PAUSE
