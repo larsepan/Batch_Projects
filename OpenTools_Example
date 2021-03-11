@@ -1,0 +1,27 @@
+@ECHO OFF
+
+::Edge Links 1
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://some.sharepoint.com/site/"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://some.sharepoint.com/site/"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://some.sharepoint.com/site/"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://some.sharepoint.com/site/"
+timeout 1
+
+::Edge Links 2
+"C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe"
+timeout 1
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "http://Some_Lockout_Origin_Auditor/"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://Some_Ticketing_Service.do"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://Some_User_Lookup_service.do"
+start "" "C:\Program Files (x86)\Microsoft\Edge\Application\msedge.exe" "https://Some_Computer_Lookup_service.do"
+timeout 1
+
+::Chrome for inContact - or replace with other phone queue management software
+start "" "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe" "https://home-c28.incontact.com/inContact/Login.aspx?ReturnUrl=%2finContact%2fDefault.aspx%3fdashboards%3don&dashboards=on"
+
+::Apps
+start "" "C:\Program Files (x86)\RSA SecurID Software Token\SecurID.exe"
+start "" "C:\Program Files (x86)\Microsoft Office\root\Office16\OUTLOOK.EXE"
+start "" "C:\Program Files (x86)\Microsoft Office\root\Office16\ONENOTE.EXE"
+start "" "C:\Program Files (x86)\Tools\lockoutstatus.exe"
+start "" "%UserProfile%\Desktop\Daily Notes.txt"
