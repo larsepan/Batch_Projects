@@ -1,6 +1,7 @@
-:: Generate QR Code
+:: Generate QR Code - Token Converter UI
 :: by Larsepan
-
+:: RSA SecureID Software Token Converter can be found...
+:: https://community.rsa.com/t5/rsa-securid-software-token/tkb-p/securid-software-token-converter
 @ECHO OFF
 CLS
 
@@ -163,8 +164,7 @@ GOTO INIT
 :README
 CLS
 ECHO.
-ECHO - This program generates QR codes from RSA sdtid files.  The eSolution Center does not
-ECHO - offer support for this program.  Please be mindful of its location and use.
+ECHO - This program generates QR codes from RSA sdtid files.  
 ECHO.
 ECHO ...............................................
 ECHO 1 - Place the sdtid file in the same folder as this batch file.  
