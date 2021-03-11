@@ -1,0 +1,177 @@
+:: Generate QR Code
+:: by Larsepan
+
+@ECHO OFF
+CLS
+
+:INIT
+SET location=
+SET choice=
+
+:MENU
+CLS
+ECHO.
+ECHO ...............................................
+ECHO  Generate QR Code from stdid file
+ECHO ...............................................
+ECHO. 
+ECHO.
+ECHO 1 - iPhone QR code
+ECHO 2 - Android QR code
+ECHO 3 - Read Me
+ECHO 4 - Exit
+ECHO.
+
+:PROMPTUSER
+ECHO.
+SET /P choice=Type a selection then press ENTER:
+IF %choice%==1 GOTO IOS
+IF %choice%==2 GOTO ANDROID
+IF %choice%==3 GOTO README
+IF %choice%==4 GOTO EOF
+IF %choice%=="" GOTO INIT
+
+:INVALID
+CLS
+ECHO "Invalid selection:" %choice%
+PAUSE
+GOTO INIT
+
+:IOS
+break>TempSettings.txt
+CLS
+@echo ios >> TempSettings.txt
+GOTO FILENAME
+
+:ANDROID
+break>TempSettings.txt
+CLS
+@echo android >> TempSettings.txt
+GOTO FILENAME
+
+:FILENAME
+CLS
+ECHO Type out the name of the sdtid file:
+ECHO Example: guttorl_000701674138
+SetLocal EnableDelayedExpansion
+SET /P name=Name:
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+::SetLocal enabledelayedexpansion
+FOR /f "tokens=* delims= " %%a in ("%name%") do set name=%%a
+FOR /l %%a in (1,1,100) do if "!name:~-1!"==" " set name=!name:~0,-1!
+::EndLocal
+::END WHITESPACE REMOVAL
+
+@echo !name! >> TempSettings.txt
+ECHO You typed !name!
+EndLocal
+GOTO PASSCHECK
+
+:PASSCHECK
+SET passyn=
+CLS
+ECHO.
+SET /P passyn=Is there a password? (Y/N):
+IF %passyn%==Y GOTO PASSWORD
+IF %passyn%==N GOTO GENERATENOPASS
+IF %passyn%==y GOTO PASSWORD
+IF %passyn%==n GOTO GENERATENOPASS
+
+:INVALIDPASSCHOICE
+CLS
+ECHO "Invalid selection:" %passyn%
+PAUSE
+GOTO PASSCHECK
+
+:PASSWORD
+CLS
+ECHO Type out the password:
+ECHO Example: gutt
+SetLocal EnableDelayedExpansion
+SET /P pass=Name:
+
+::REMOVES LEADING AND TRAILING WHITESPACE
+::SetLocal enabledelayedexpansion
+FOR /f "tokens=* delims= " %%a in ("%pass%") do set pass=%%a
+FOR /l %%a in (1,1,100) do if "!pass:~-1!"==" " set pass=!pass:~0,-1!
+::EndLocal
+::END WHITESPACE REMOVAL
+
+@echo !pass! >> TempSettings.txt
+REM ECHO You typed !pass!
+REM PAUSE
+EndLocal
+GOTO GENERATEPASS
+
+:GENERATENOPASS
+CLS
+SetLocal EnableDelayedExpansion
+
+::OS
+set /p os= <TempSettings.txt
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%os%") do set os=%%a
+FOR /l %%a in (1,1,100) do if "!os:~-1!"==" " set os=!os:~0,-1!
+
+::FILE NAME
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" TempSettings.txt') do if %%G equ 2 set fileName= %%H
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%fileName%") do set fileName=%%a
+FOR /l %%a in (1,1,100) do if "!fileName:~-1!"==" " set fileName=!fileName:~0,-1!
+
+REM pause
+java -jar TokenConverter.jar !fileName!.sdtid -!os! -qr -o qrCode.jpeg
+ECHO Process complete.
+PAUSE
+GOTO INIT
+
+:GENERATEPASS
+CLS
+SetLocal EnableDelayedExpansion
+
+::OS
+set /p os= <TempSettings.txt
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%os%") do set os=%%a
+FOR /l %%a in (1,1,100) do if "!os:~-1!"==" " set os=!os:~0,-1!
+
+::FILE NAME
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" TempSettings.txt') do if %%G equ 2 set fileName= %%H
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%fileName%") do set fileName=%%a
+FOR /l %%a in (1,1,100) do if "!fileName:~-1!"==" " set fileName=!fileName:~0,-1!
+
+::PASSWORD
+for /f "tokens=1*delims=:" %%G in ('findstr /n "^" TempSettings.txt') do if %%G equ 3 set getPass= %%H
+::REMOVES LEADING AND TRAILING WHITESPACE
+FOR /f "tokens=* delims= " %%a in ("%getPass%") do set getPass=%%a
+FOR /l %%a in (1,1,100) do if "!getPass:~-1!"==" " set getPass=!getPass:~0,-1!
+
+REM pause
+java -jar TokenConverter.jar !fileName!.sdtid -!os! -qr -p !getPass! -o qrCode.jpeg
+ECHO Process complete.
+PAUSE
+GOTO INIT
+
+:NOTEXIST
+CLS
+ECHO That path does not exist.  Please set a destination path first.
+PAUSE
+GOTO INIT
+
+:README
+CLS
+ECHO.
+ECHO - This program generates QR codes from RSA sdtid files.  The eSolution Center does not
+ECHO - offer support for this program.  Please be mindful of its location and use.
+ECHO.
+ECHO ...............................................
+ECHO 1 - Place the sdtid file in the same folder as this batch file.  
+ECHO 2 - This batch file calls on a java program called "TokenConverter"
+ECHO 3 - Select an OS type and whether you need a password.
+ECHO 4 - The QR code will be called "qrCode.jpg".
+ECHO 5 - It will be made in the same folder as the rest of these files.
+ECHO.
+PAUSE
+GOTO INIT
